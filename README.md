@@ -44,7 +44,7 @@ define('RRH_PINTEREST_APP_SECRET','your-pinterest-app-secret-here');
 - Pinterest App ID + Secret → [developers.pinterest.com](https://developers.pinterest.com) → My Apps
 - imgBB API Key → [api.imgbb.com](https://api.imgbb.com)
 
-**Note:** `RRH_META_CATALOG_ID` and `RRH_INSTAGRAM_USER_ID` are not secret but are stored here for consistency so all config lives in one place.
+**Note:** `RRH_META_CATALOG_ID` and `RRH_INSTAGRAM_USER_ID` are not secret but stored here for consistency.
 
 ---
 
@@ -199,7 +199,7 @@ Auto-posts WooCommerce products to Pinterest. Standard API (approved).
 
 ---
 
-### 7. `rt-upcoming-events` — Upcoming Events
+### 7. `rrh-upcoming-events` — Upcoming Events
 **Current version:** 1.3.2
 
 Events display plugin for the frontend.
@@ -211,7 +211,7 @@ Events display plugin for the frontend.
 
 ---
 
-### 8. `rt-live-scores-ticker` — Live Scores Ticker
+### 8. `rt-live-scores` — Live Scores Ticker
 **Current version:** 2.0.0
 
 ESPN API-powered live scores ticker bar for the site.
@@ -250,6 +250,75 @@ Admin UI for adding product reviews without waiting for customer submissions.
 - Properly updates WooCommerce review meta fields and clears cached data
 
 **Note:** Requires `rt-google-shopping` v1.3.1+ and `rt-meta-shopping` v1.1.1+. Earlier versions had a `private` method bug that caused a fatal error when this plugin inserted a review and triggered `woocommerce_update_product`.
+
+---
+
+### 11. `rrh-menu-organizer` — Admin Menu Organizer
+**Current version:** 2.1.0
+
+Drag-and-drop reordering of the entire WordPress admin sidebar menu.
+
+**Location:** Tools → Menu Organizer
+
+**Features:**
+- Full drag-and-drop reorder of all admin menu items
+- Separator support (add/remove dividers between menu groups)
+- Saves order to `wp_options`
+- New plugins added after reordering are automatically appended at the bottom
+- Reset to default WordPress order
+
+---
+
+### 12. `rt-coupon-engine` — Dynamic Coupon Engine
+**Current version:** 1.0.0
+
+Schedule and automate promotional coupons with seasonal templates, smart rules, and a frontend announcement bar.
+
+**Features:**
+- Schedule promotions with start/end dates (auto-activates/deactivates via WP cron)
+- Discount types: percentage, fixed cart, fixed product
+- Smart rules: minimum cart total, max uses, max uses per customer, first-time buyers only
+- Seasonal templates (pre-built holiday/event promotions)
+- Auto-applies coupon to cart when promotion is active
+- Frontend announcement bar (displays active promo at top of site)
+- Promotion stats dashboard
+- Creates and manages WooCommerce coupons automatically
+
+**DB table:** `wp_rtce_promotions`
+
+---
+
+### 13. `rt-social-proof` — Social Proof Notifications
+**Current version:** 1.1.0
+
+Live social proof toast popups showing recent purchases, product views, add-to-carts, and browsing activity.
+
+**Features:**
+- Toast popup notifications on frontend (bottom corner)
+- Tracks real WooCommerce orders, product views, and add-to-cart events
+- Displays city/state/country with each notification
+- Configurable display settings (frequency, duration, delay, position)
+- Admin stats dashboard showing notification impressions
+- Self-healing settings (auto-restores missing config keys on init)
+- Reset to defaults button
+
+**DB table:** `wp_rtsp_activity`
+
+---
+
+### 14. `rt-stadium-finder` — Stadium Finder
+**Current version:** 1.0.0
+
+Interactive frontend tool — fans pick their sport, league, and team to find matching coasters and wall art in the shop.
+
+**Shortcode:** `[rrh_stadium_finder]`
+
+**Features:**
+- Step-by-step selector: Sport → League → Team
+- Sports covered: Football (NFL, College), Baseball (MLB, College), Basketball (NBA, WNBA, College), Hockey (NHL), Soccer (MLS, College)
+- Maps each team to WooCommerce product categories for coasters and wall art
+- Search results link directly to filtered shop pages
+- No external API — team/league data is built into the plugin
 
 ---
 
