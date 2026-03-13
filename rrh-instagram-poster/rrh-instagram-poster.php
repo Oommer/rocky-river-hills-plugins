@@ -3,7 +3,7 @@
  * Plugin Name: RRH Instagram Poster
  * Plugin URI: https://rockyriverhills.com
  * Description: Auto-post to Instagram from WooCommerce. Bulk posting, carousels, auto-post on publish, engagement tracking, content calendar, link-in-bio, caption templates, sale announcements, and content recycling.
- * Version: 3.4.0
+ * Version: 3.4.1
  * Author: Rocky River Hills
  * Text Domain: rrh-instagram
  * Requires PHP: 7.4
@@ -11,7 +11,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('RRH_IG_VERSION', '3.2.6');
+define('RRH_IG_VERSION', '3.4.1');
 define('RRH_IG_PATH', plugin_dir_path(__FILE__));
 define('RRH_IG_URL', plugin_dir_url(__FILE__));
 

@@ -10,11 +10,11 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('RTPP_VERSION', '1.4.5');
+define('RTPP_VERSION', '1.4.6');
 define('RTPP_PATH', plugin_dir_path(__FILE__));
 define('RTPP_URL', plugin_dir_url(__FILE__));
-define('RTPP_APP_ID', '1547820');
-define('RTPP_APP_SECRET', 'eb20b523c51c2623099a830c9c5f5eb850e7db3b');
+define('RTPP_APP_ID', defined('RRH_PINTEREST_APP_ID') ? RRH_PINTEREST_APP_ID : '');
+define('RTPP_APP_SECRET', defined('RRH_PINTEREST_APP_SECRET') ? RRH_PINTEREST_APP_SECRET : '');
 define('RTPP_API_PRODUCTION', 'https://api.pinterest.com/v5');
 define('RTPP_API_SANDBOX', 'https://api-sandbox.pinterest.com/v5');
 define('RTPP_OAUTH_PRODUCTION', 'https://www.pinterest.com/oauth/');

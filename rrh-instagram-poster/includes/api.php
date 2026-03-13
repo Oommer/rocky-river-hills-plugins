@@ -8,11 +8,11 @@ class RRH_IG_API {
 
     private function get_credentials() {
         return [
-            'app_id' => get_option('rrh_ig_app_id', ''),
-            'app_secret' => get_option('rrh_ig_app_secret', ''),
-            'access_token' => get_option('rrh_ig_access_token', ''),
-            'user_id' => get_option('rrh_ig_user_id', ''),
-            'fb_token' => get_option('rrh_ig_fb_page_token', ''),
+            'app_id'       => get_option('rrh_ig_app_id', defined('RRH_META_APP_ID') ? RRH_META_APP_ID : ''),
+            'app_secret'   => get_option('rrh_ig_app_secret', defined('RRH_META_APP_SECRET') ? RRH_META_APP_SECRET : ''),
+            'access_token' => get_option('rrh_ig_access_token', defined('RRH_META_SYSTEM_TOKEN') ? RRH_META_SYSTEM_TOKEN : ''),
+            'user_id'      => get_option('rrh_ig_user_id', defined('RRH_INSTAGRAM_USER_ID') ? RRH_INSTAGRAM_USER_ID : ''),
+            'fb_token'     => get_option('rrh_ig_fb_page_token', defined('RRH_FACEBOOK_PAGE_TOKEN') ? RRH_FACEBOOK_PAGE_TOKEN : ''),
         ];
     }
 
