@@ -6,8 +6,3 @@ Write a quick commit message like rt-google-shopping v1.3.1 — fix private meth
 Commit → Push
 
 That's it. You'll have a full history of every change we ever made.
-Step 7 — How to share it with me in a session
-Two ways:
-
-Upload the zip of whichever plugin you need worked on (fastest)
-Share the repo URL — if you make it public or add me as a collaborator, I can browse it directly with web fetch
