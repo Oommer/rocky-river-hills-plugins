@@ -2,7 +2,7 @@
 
 Custom WordPress/WooCommerce plugins and site code for [rockyriverhills.com](https://rockyriverhills.com) — handmade stadium coasters & wall art, Albemarle, NC.
 
-Built and maintained by Brady Kohler in collaboration with Claude (Anthropic).
+Built and maintained by Rocky River Hills in collaboration with Claude (Anthropic).
 
 ---
 
