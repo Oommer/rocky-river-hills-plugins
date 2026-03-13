@@ -21,6 +21,33 @@ Built and maintained by Brady Kohler in collaboration with Claude (Anthropic).
 
 ---
 
+## Credentials & `wp-config.php`
+
+All plugin credentials are stored in `wp-config.php` on the server — never hardcoded in plugin files. Paste these just before the `/* That's all, stop editing! */` line:
+
+```php
+// Rocky River Hills — Plugin Credentials
+define('RRH_META_SYSTEM_TOKEN',   'your-meta-system-user-token-here');
+define('RRH_META_APP_ID',         'your-meta-app-id-here');
+define('RRH_META_APP_SECRET',     'your-meta-app-secret-here');
+define('RRH_META_CATALOG_ID',     '1610766919969813');
+define('RRH_INSTAGRAM_USER_ID',   '17841457163070838');
+define('RRH_FACEBOOK_PAGE_TOKEN', 'your-facebook-page-token-here');
+define('RRH_IMGBB_API_KEY',       'your-imgbb-api-key-here');
+define('RRH_PINTEREST_APP_ID',    'your-pinterest-app-id-here');
+define('RRH_PINTEREST_APP_SECRET','your-pinterest-app-secret-here');
+```
+
+**Where to find credentials:**
+- Meta System Token, App ID, App Secret → [developers.facebook.com](https://developers.facebook.com) → My Apps → Settings → Basic
+- Facebook Page Token → Meta Business Manager → System Users
+- Pinterest App ID + Secret → [developers.pinterest.com](https://developers.pinterest.com) → My Apps
+- imgBB API Key → [api.imgbb.com](https://api.imgbb.com)
+
+**Note:** `RRH_META_CATALOG_ID` and `RRH_INSTAGRAM_USER_ID` are not secret but are stored here for consistency so all config lives in one place.
+
+---
+
 ## Plugin Index
 
 ### 1. `rt-traffic-tracker` — Real-Time Traffic Tracker
@@ -89,7 +116,8 @@ WooCommerce → Google Merchant Center product feed.
 - Settings race condition fix
 - 0-products bug fix (WooCommerce `is_visible()` filter)
 
-**Bug fixed in 1.3.1:** `schedule_regeneration()` declared `private` but registered as WP hook — caused fatal error when any plugin triggered `woocommerce_update_product`.
+**Changelog:**
+- `1.3.1` — `schedule_regeneration()` changed `private` → `public`. Was causing fatal error when any plugin triggered `woocommerce_update_product` (e.g. adding a review via Admin Review Manager)
 
 ---
 
@@ -102,14 +130,14 @@ WooCommerce → Meta/Facebook product catalog feed.
 - Product catalog XML/CSV feed
 - Checkout URL handler for Meta Commerce integration
 - Setup guide included
-- Meta Catalog ID: `1610766919969813`
 
-**Bug fixed in 1.1.1:** Same `private` method / WP hook fatal error as Google Shopping (fixed same session).
+**Changelog:**
+- `1.1.1` — Same `private` → `public` fix as Google Shopping, fixed same session
 
 ---
 
-### 5. `rt-instagram-poster` — Instagram Poster
-**Current version:** 3.4
+### 5. `rrh-instagram-poster` — Instagram Poster
+**Current version:** 3.4.1
 
 Auto-posts WooCommerce products to Instagram with Shopping product tagging.
 
@@ -117,15 +145,27 @@ Auto-posts WooCommerce products to Instagram with Shopping product tagging.
 - Carousel post support
 - Instagram Shopping product tagging
 - Category-interleaved post scheduling
-- Permanent System User token (no expiry)
+- Bulk post queue with scheduling
+- Content calendar
+- Engagement insights sync
+- Autopilot mode (auto-selects products and posts on schedule)
+- Content recycling (re-queues high-engagement old posts)
+- Link-in-bio page
+- Per-product and per-category hashtag management
+- Caption templates
+- imgBB external image hosting (bypasses CDN issues)
 
-**Key IDs:**
-| Key | Value |
+**Credentials** — stored in `wp_options` via Settings page, with `wp-config` constants as fallback:
+
+| Constant | Purpose |
 |---|---|
-| Meta Catalog ID | `1610766919969813` |
-| Instagram User ID | `17841457163070838` |
-| Facebook Page ID | `110995055209248` |
-| App ID | `2539917699858917` |
+| `RRH_META_SYSTEM_TOKEN` | Instagram/Facebook API access |
+| `RRH_META_APP_ID` | Meta app ID |
+| `RRH_META_APP_SECRET` | Meta app secret |
+| `RRH_INSTAGRAM_USER_ID` | `17841457163070838` |
+| `RRH_FACEBOOK_PAGE_TOKEN` | Facebook Page token |
+| `RRH_META_CATALOG_ID` | `1610766919969813` |
+| `RRH_IMGBB_API_KEY` | Image hosting |
 
 **Required token permissions:** `business_management`, `catalog_management`, `instagram_basic`, `instagram_content_publish`, `instagram_manage_comments`, `instagram_shopping_tag_products`, `pages_read_engagement`
 
@@ -133,12 +173,15 @@ Auto-posts WooCommerce products to Instagram with Shopping product tagging.
 
 **Tagging flow:** Publish via `graph.instagram.com` → look up Page → IG Business Account → most recent Graph API media ID → get carousel children → tag each child with `updated_tags` + `x`/`y` via `graph.facebook.com`
 
-**Known quirk:** Firefox's "Don't show again" on confirm dialogs can suppress plugin confirm() calls. Fix via `about:config` → `dom.successive_dialog_time_limit = 0`.
+**Known quirk:** Firefox's "Don't show again" on confirm dialogs can suppress plugin `confirm()` calls. Fix via `about:config` → `dom.successive_dialog_time_limit = 0`.
+
+**Changelog:**
+- `3.4.1` — `includes/api.php` updated to fall back to `wp-config` constants if `wp_options` values are empty
 
 ---
 
 ### 6. `rt-pinterest-poster` — Pinterest Poster
-**Current version:** 1.4.5
+**Current version:** 1.4.6
 
 Auto-posts WooCommerce products to Pinterest. Standard API (approved).
 
@@ -148,6 +191,11 @@ Auto-posts WooCommerce products to Pinterest. Standard API (approved).
 - Category-interleaved scheduling (prevents same stadium products posting consecutively)
 - Smart short description truncation (no mid-word cuts)
 - Strips heading lines ("Specifications:", "Product Features:") from pin descriptions
+
+**Credentials:** `RRH_PINTEREST_APP_ID`, `RRH_PINTEREST_APP_SECRET` (from `wp-config`). Access token stored in `wp_options` via OAuth flow.
+
+**Changelog:**
+- `1.4.6` — Removed hardcoded `RTPP_APP_ID` and `RTPP_APP_SECRET` constants. Now reads from `wp-config` constants `RRH_PINTEREST_APP_ID` and `RRH_PINTEREST_APP_SECRET`
 
 ---
 
@@ -201,6 +249,8 @@ Admin UI for adding product reviews without waiting for customer submissions.
 - "Verified Purchase" badge: `#A2755A` brown background, white text, rounded pill
 - Properly updates WooCommerce review meta fields and clears cached data
 
+**Note:** Requires `rt-google-shopping` v1.3.1+ and `rt-meta-shopping` v1.1.1+. Earlier versions had a `private` method bug that caused a fatal error when this plugin inserted a review and triggered `woocommerce_update_product`.
+
 ---
 
 ## Site Code (`site-code/`)
@@ -242,15 +292,27 @@ Darkify plugin dark mode customizations:
 - **Shop page disappearing** — caused by WooCommerce Payments/Shipping/Tax plugins recreating Jetpack cron jobs even after Jetpack deletion. Workaround: server-level cron every minute clears WC transients + flushes permalinks
 - **WP hook callbacks must be `public`** — any method registered via `add_action()` or `add_filter()` must be `public`, not `private`. PHP fatal error otherwise when WordPress tries to call it externally
 - **Email logo** — must be PNG. GIF format does not render reliably across Gmail, Outlook, and other email clients
+- **Credentials never in code** — all API tokens and secrets live in `wp-config.php` only. Never commit real credential values to the repo
 
 ---
 
 ## Development Workflow
 
-1. Upload current plugin zip to Claude
+1. Upload current plugin zip to Claude (or share raw GitHub URL if repo is public)
 2. Describe the change or bug
 3. Claude returns updated zip with bumped version number
 4. Replace files via FTP or WordPress plugin uploader
 5. Clear Hostinger OPcache if needed
 6. Update files in this repo via GitHub Desktop
 7. Commit with message format: `plugin-name vX.X.X — description of change`
+
+---
+
+## Version History
+
+| Plugin | Version | Date | Notes |
+|---|---|---|---|
+| `rt-google-shopping` | 1.3.1 | 2026-03-13 | `schedule_regeneration()` private→public bug fix |
+| `rt-meta-shopping` | 1.1.1 | 2026-03-13 | `schedule_regeneration()` private→public bug fix |
+| `rrh-instagram-poster` | 3.4.1 | 2026-03-13 | `api.php` falls back to wp-config constants |
+| `rt-pinterest-poster` | 1.4.6 | 2026-03-13 | Hardcoded credentials moved to wp-config |
