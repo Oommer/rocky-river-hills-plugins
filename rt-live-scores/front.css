@@ -1,0 +1,195 @@
+/* RT Live Scores — ESPN Ticker v2.0.2 */
+
+.rtls-ticker {
+    background: #0b0b0b;
+    width: 100% !important;
+    max-width: none !important;
+    overflow: hidden;
+    position: relative;
+    height: 56px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    border-bottom: 1px solid #222;
+    box-sizing: border-box;
+    width: 100% !important;
+}
+
+.rtls-scroll {
+    display: flex;
+    width: max-content;
+    animation: rtls-slide 120s linear infinite;
+    height: 100%;
+}
+.rtls-scroll:hover { animation-play-state: paused; }
+
+@keyframes rtls-slide {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.rtls-track {
+    display: flex;
+    align-items: stretch;
+    height: 56px;
+    flex-shrink: 0;
+}
+
+/* League separator */
+.rtls-sep {
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    height: 56px;
+    border-right: 1px solid #222;
+    flex-shrink: 0;
+}
+.rtls-sep span {
+    font-size: 10px;
+    font-weight: 800;
+    color: #A2755A;
+    letter-spacing: 1.5px;
+}
+
+/* Game card — grid: time | teams | (optional shop) */
+.rtls-g {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: 1fr 1fr;
+    height: 56px;
+    align-items: center;
+    border-right: 1px solid #222;
+    flex-shrink: 0;
+}
+
+/* Time column spans both rows */
+.rtls-time {
+    grid-row: 1 / 3;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    min-width: 64px;
+    height: 100%;
+    border-right: 1px solid #1a1a1a;
+    gap: 1px;
+}
+
+.rtls-clk {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ccc;
+    white-space: nowrap;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.rtls-tv {
+    font-size: 8px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Live game */
+.rtls-g.rtls-live .rtls-clk { color: #ff3333; }
+.rtls-g.rtls-live .rtls-time::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: #ff3333;
+    border-radius: 50%;
+    margin-bottom: 2px;
+    animation: rtls-blink 1s step-start infinite;
+}
+@keyframes rtls-blink { 50% { opacity: 0; } }
+
+/* Team rows */
+.rtls-tm {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    height: 28px;
+    white-space: nowrap;
+}
+
+.rtls-tm:nth-child(2) { grid-row: 1; }
+.rtls-tm:nth-child(3) { grid-row: 2; border-top: 1px solid #1a1a1a; }
+
+.rtls-logo {
+    width: 16px; height: 16px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.rtls-ab {
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    min-width: 28px;
+}
+
+.rtls-rc {
+    font-size: 9px;
+    color: #555;
+    font-weight: 600;
+}
+
+.rtls-sc {
+    font-size: 13px;
+    font-weight: 900;
+    color: #fff;
+    min-width: 18px;
+    text-align: right;
+    margin-left: auto;
+    padding-left: 10px;
+}
+
+.rtls-dim .rtls-ab,
+.rtls-dim .rtls-sc { color: #555; }
+
+/* Shop link — separate column spanning both rows */
+.rtls-shop {
+    grid-row: 1 / 3;
+    grid-column: 3;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 3px;
+    background: #A2755A;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    transition: background 0.2s;
+    min-width: 18px;
+}
+.rtls-shop:hover {
+    background: #8B6348;
+    color: #fff !important;
+}
+
+/* When shop link present, update grid */
+.rtls-g.rtls-has-shop {
+    grid-template-columns: auto auto auto;
+}
+
+/* No games */
+.rtls-nogames {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #555;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0 20px;
+    white-space: nowrap;
+}

@@ -1,0 +1,130 @@
+.rrh-events-wrap {
+    max-width: 1000px;
+}
+.rrh-events-form-card,
+.rrh-events-list-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.rrh-events-form-card h2,
+.rrh-events-list-card h2,
+.rrh-events-preview-card h2 {
+    margin-top: 0;
+    color: #6B4A3A;
+}
+.rrh-past-event td {
+    opacity: 0.45;
+}
+.rrh-past-event:hover td {
+    opacity: 0.7;
+}
+#rrh-events-table th {
+    font-weight: 600;
+}
+#rrh-event-msg.success,
+#rrh-styles-msg.success {
+    background: #edfaef;
+    border: 1px solid #00a32a;
+    color: #00a32a;
+}
+#rrh-event-msg.error,
+#rrh-styles-msg.error {
+    background: #fcf0f0;
+    border: 1px solid #d63638;
+    color: #d63638;
+}
+
+/* Style Settings */
+.rrh-style-section {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.rrh-style-section:last-of-type {
+    border-bottom: none;
+}
+.rrh-style-section h3 {
+    color: #6B4A3A;
+    margin-bottom: 0;
+    font-size: 14px;
+}
+.rrh-style-section .form-table th {
+    width: 130px;
+    padding: 8px 10px 8px 0;
+    font-weight: 500;
+}
+.rrh-style-section .form-table td {
+    padding: 8px 10px;
+}
+.rrh-range-input {
+    width: 220px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+.rrh-range-value {
+    display: inline-block;
+    min-width: 50px;
+    font-weight: 600;
+    color: #6B4A3A;
+}
+
+/* Tabs */
+.nav-tab-wrapper {
+    margin-bottom: 0 !important;
+}
+.nav-tab-active {
+    background: #fff !important;
+    border-bottom-color: #fff !important;
+}
+
+/* ==================== FULL-WIDTH PREVIEW ==================== */
+.rrh-events-preview-card {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    /* Break out of the 1000px wrap to simulate real site width */
+    max-width: none;
+    width: calc(100vw - 200px); /* account for WP admin sidebar */
+    margin-left: -20px;
+    position: relative;
+}
+.rrh-preview-frame {
+    background: #f0eeeb;
+    border-radius: 6px;
+    margin: 10px auto 0;
+    padding: 30px 0;
+    /* Match your site's content width */
+    max-width: 1140px;
+    width: 100%;
+    position: relative;
+}
+.rrh-preview-frame::before {
+    content: 'rockyriverhills.com — 1140px content area';
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    font-family: monospace;
+}
+.rrh-preview-rulers {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    margin-top: 10px;
+    font-size: 10px;
+    color: #bbb;
+    font-family: monospace;
+    border-top: 1px dashed #ddd;
+    padding-top: 6px;
+}

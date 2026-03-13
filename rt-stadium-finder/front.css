@@ -1,0 +1,81 @@
+/* RT Stadium Finder — Frontend */
+.rtsf-finder { max-width: 1140px; margin: 0 auto; padding: 20px 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+/* Hero */
+.rtsf-hero { text-align: center; margin-bottom: 30px; }
+.rtsf-title { font-size: 32px; font-weight: 700; color: #A2755A; margin: 0 0 8px; }
+.rtsf-subtitle { font-size: 16px; color: #777; margin: 0; }
+
+/* Steps */
+.rtsf-step { display: none; animation: rtsf-fadeIn .4s ease; }
+.rtsf-step.active { display: block; }
+@keyframes rtsf-fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.rtsf-step-label { text-align: center; font-size: 18px; font-weight: 600; color: #444; margin-bottom: 20px; }
+
+/* Breadcrumb */
+.rtsf-breadcrumb { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 10px 16px; background: #f9f7f4; border-radius: 8px; }
+.rtsf-back { color: #A2755A; text-decoration: none; font-weight: 600; font-size: 14px; }
+.rtsf-back:hover { text-decoration: underline; }
+.rtsf-breadcrumb span { font-size: 14px; color: #666; }
+
+/* Sport Grid */
+.rtsf-sport-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.rtsf-sport-card { background: #fff; border: 2px solid #f0eeeb; border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all .25s ease; }
+.rtsf-sport-card:hover { border-color: #A2755A; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(162,117,90,.15); }
+.rtsf-sport-card.selected { border-color: #A2755A; background: #faf6f2; }
+.rtsf-sport-icon { font-size: 48px; display: block; margin-bottom: 10px; }
+.rtsf-sport-name { font-size: 15px; font-weight: 600; color: #333; }
+
+/* League Grid */
+.rtsf-league-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; max-width: 700px; margin: 0 auto; }
+.rtsf-league-card { background: #fff; border: 2px solid #f0eeeb; border-radius: 12px; padding: 24px 20px; text-align: center; cursor: pointer; transition: all .25s ease; font-size: 16px; font-weight: 600; color: #444; }
+.rtsf-league-card:hover { border-color: #A2755A; transform: translateY(-3px); box-shadow: 0 6px 18px rgba(162,117,90,.12); }
+
+/* Search */
+.rtsf-search-bar { margin-bottom: 16px; }
+.rtsf-search-bar input { width: 100%; padding: 14px 20px; border: 2px solid #f0eeeb; border-radius: 12px; font-size: 15px; outline: none; transition: border-color .2s; box-sizing: border-box; }
+.rtsf-search-bar input:focus { border-color: #A2755A; }
+.rtsf-search-bar input::placeholder { color: #bbb; }
+
+/* Results header */
+.rtsf-results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.rtsf-results-header span { font-size: 14px; color: #777; }
+.rtsf-filter-btns { display: flex; gap: 6px; }
+.rtsf-filter { padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; cursor: pointer; transition: all .2s; color: #666; }
+.rtsf-filter:hover { border-color: #A2755A; color: #A2755A; }
+.rtsf-filter.active { background: #A2755A; color: #fff; border-color: #A2755A; }
+
+/* Product Grid */
+.rtsf-product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.rtsf-product-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #f0eeeb; transition: all .25s ease; animation: rtsf-fadeIn .4s ease; }
+.rtsf-product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.rtsf-product-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; background: #f4f1ed; display: block; }
+.rtsf-product-info { padding: 16px; }
+.rtsf-product-type { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #A2755A; font-weight: 600; margin-bottom: 4px; }
+.rtsf-product-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 8px; line-height: 1.3; }
+.rtsf-product-bottom { display: flex; align-items: center; justify-content: space-between; }
+.rtsf-product-price { font-size: 18px; font-weight: 700; color: #A2755A; }
+.rtsf-product-btn { display: inline-block; padding: 8px 16px; background: #A2755A; color: #fff; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; transition: background .2s; }
+.rtsf-product-btn:hover { background: #8B6348; color: #fff; }
+
+/* Loading */
+.rtsf-loading { text-align: center; padding: 40px; color: #999; }
+.rtsf-spinner { width: 32px; height: 32px; border: 3px solid #f0eeeb; border-top-color: #A2755A; border-radius: 50%; animation: rtsf-spin .8s linear infinite; margin: 0 auto 12px; }
+@keyframes rtsf-spin { to { transform: rotate(360deg); } }
+
+.rtsf-empty { text-align: center; padding: 40px; color: #999; font-size: 15px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .rtsf-sport-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .rtsf-sport-card { padding: 20px 12px; }
+    .rtsf-sport-icon { font-size: 36px; }
+    .rtsf-product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .rtsf-title { font-size: 24px; }
+    .rtsf-results-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+    .rtsf-sport-grid { grid-template-columns: repeat(2, 1fr); }
+    .rtsf-product-grid { grid-template-columns: 1fr; }
+}

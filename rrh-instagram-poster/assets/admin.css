@@ -1,0 +1,138 @@
+/* RRH Instagram Poster Admin v2 */
+.rrh-ig-wrap { max-width: 1400px; }
+
+/* Cards */
+.rrh-ig-card { background:#fff; border:1px solid #c3c4c7; border-radius:4px; padding:20px 24px; margin-bottom:20px; box-shadow:0 1px 1px rgba(0,0,0,.04); }
+.rrh-ig-card h2 { margin-top:0; padding-bottom:12px; border-bottom:1px solid #eee; }
+
+/* Grids */
+.rrh-ig-settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.rrh-ig-composer-grid { display:grid; grid-template-columns:1fr 380px; gap:20px; align-items:flex-start; }
+.rrh-ig-bulk-grid { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:flex-start; }
+.rrh-ig-insights-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+/* Stats Grid */
+.rrh-ig-stats-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px; }
+.rrh-ig-stat-card { background:#fff; border:1px solid #c3c4c7; border-radius:4px; padding:16px; text-align:center; }
+.rrh-ig-stat-card .stat-number { font-size:28px; font-weight:700; color:#2271b1; }
+.rrh-ig-stat-card .stat-label { font-size:12px; color:#666; margin-top:4px; }
+
+/* Token Status */
+.rrh-ig-token-status { padding:12px 16px; border-radius:4px; margin-bottom:16px; font-size:14px; }
+.rrh-ig-token-status.good { background:#d4edda; border:1px solid #c3e6cb; color:#155724; }
+.rrh-ig-token-status.warning { background:#fff3cd; border:1px solid #ffeaa7; color:#856404; }
+.rrh-ig-token-status.error { background:#f8d7da; border:1px solid #f5c6cb; color:#721c24; }
+.rrh-ig-token-status .expired { color:#dc3545; font-weight:bold; }
+.rrh-ig-token-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+/* Result Box */
+.rrh-ig-result { margin-top:16px; padding:12px 16px; border-radius:4px; font-size:13px; }
+.rrh-ig-result.success { background:#d4edda; border:1px solid #c3e6cb; }
+.rrh-ig-result.error { background:#f8d7da; border:1px solid #f5c6cb; }
+.rrh-ig-result .account-info { display:flex; align-items:center; gap:12px; }
+.rrh-ig-result .account-info img { width:48px; height:48px; border-radius:50%; }
+
+/* Fields */
+.rrh-ig-field { margin-bottom:20px; }
+.rrh-ig-field > label { display:block; font-weight:600; margin-bottom:6px; font-size:13px; }
+
+/* Radio Groups */
+.rrh-ig-radio-group { display:flex; gap:8px; flex-wrap:wrap; }
+.rrh-ig-radio { display:flex; align-items:center; gap:6px; padding:8px 16px; border:2px solid #ddd; border-radius:6px; cursor:pointer; transition:all .2s; font-size:13px; }
+.rrh-ig-radio:hover { border-color:#2271b1; }
+.rrh-ig-radio.active, .rrh-ig-radio:has(input:checked) { border-color:#2271b1; background:#f0f6fc; }
+.rrh-ig-radio input[type="radio"] { margin:0; }
+
+/* Dropdowns */
+.rrh-ig-dropdown { max-height:250px; overflow-y:auto; border:1px solid #ddd; border-radius:4px; display:none; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+.rrh-ig-dropdown.active { display:block; }
+.rrh-ig-dropdown-item { display:flex; align-items:center; gap:12px; padding:10px 12px; cursor:pointer; border-bottom:1px solid #f0f0f0; }
+.rrh-ig-dropdown-item:hover { background:#f0f6fc; }
+.rrh-ig-dropdown-item img { width:40px; height:40px; object-fit:cover; border-radius:4px; }
+.rrh-ig-dropdown-item .product-info strong { display:block; font-size:13px; }
+.rrh-ig-dropdown-item .product-info span { color:#666; font-size:12px; }
+.rrh-ig-selected-product { display:flex; align-items:center; gap:12px; padding:12px; background:#f0f6fc; border:2px solid #2271b1; border-radius:6px; margin-top:8px; }
+.rrh-ig-selected-product img { width:60px; height:60px; object-fit:cover; border-radius:4px; }
+.rrh-ig-selected-product .remove-product { margin-left:auto; color:#dc3545; cursor:pointer; font-size:18px; }
+
+/* Upload */
+.rrh-ig-upload-area { padding:16px; border:2px dashed #ddd; border-radius:6px; text-align:center; }
+.rrh-ig-preview img, .rrh-ig-preview video { max-width:200px; max-height:200px; border-radius:4px; margin:8px 4px; }
+
+/* Caption */
+#rrh-ig-caption { font-size:14px; line-height:1.6; resize:vertical; min-height:120px; }
+.rrh-ig-caption-meta { display:flex; justify-content:space-between; font-size:12px; color:#666; margin-top:4px; }
+.rrh-ig-caption-meta .over-limit { color:#dc3545; font-weight:bold; }
+.rrh-ig-hashtag-presets { display:flex; gap:6px; flex-wrap:wrap; }
+
+/* Buttons */
+.rrh-ig-button-group { display:flex; gap:8px; flex-wrap:wrap; }
+.rrh-ig-schedule-row { margin-bottom:16px; }
+.rrh-ig-schedule-row label { display:block; font-weight:600; margin-bottom:4px; font-size:13px; }
+
+/* Phone Preview */
+.rrh-ig-preview-card { position:sticky; top:42px; }
+.rrh-ig-phone-preview { border:2px solid #ddd; border-radius:12px; overflow:hidden; background:#fff; max-width:340px; margin:0 auto; }
+.rrh-ig-phone-header { padding:12px 16px; border-bottom:1px solid #eee; font-size:14px; }
+.rrh-ig-phone-image { width:100%; aspect-ratio:1; background:#f5f5f5; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.rrh-ig-phone-image img { width:100%; height:100%; object-fit:cover; }
+.rrh-ig-phone-image .placeholder-text { color:#999; font-size:13px; }
+.rrh-ig-phone-caption { padding:12px 16px; font-size:13px; line-height:1.5; max-height:150px; overflow-y:auto; word-wrap:break-word; }
+.rrh-ig-phone-caption strong { margin-right:4px; }
+
+/* Queue Table */
+.rrh-ig-thumb { width:50px; height:50px; object-fit:cover; border-radius:4px; }
+.rrh-ig-thumb-placeholder { width:50px; height:50px; display:flex; align-items:center; justify-content:center; background:#f0f0f0; border-radius:4px; font-size:24px; }
+.rrh-ig-caption-preview { font-size:13px; color:#333; }
+.rrh-ig-error-msg { font-size:12px; color:#dc3545; margin-top:4px; }
+.rrh-ig-badge { font-size:11px; background:#e8f4fd; color:#0d6efd; padding:1px 6px; border-radius:8px; }
+
+/* Status Badges */
+.rrh-ig-status { display:inline-block; padding:2px 8px; border-radius:10px; font-size:12px; white-space:nowrap; }
+.rrh-ig-status-queued { background:#e8f4fd; color:#0d6efd; }
+.rrh-ig-status-publishing { background:#fff3cd; color:#856404; }
+.rrh-ig-status-published { background:#d4edda; color:#155724; }
+.rrh-ig-status-failed { background:#f8d7da; color:#721c24; }
+
+/* Tabs */
+.rrh-ig-settings-tabs { display:flex; gap:0; border-bottom:2px solid #2271b1; margin-bottom:20px; }
+.rrh-ig-tab { padding:10px 20px; text-decoration:none; color:#666; border:1px solid transparent; border-bottom:none; border-radius:4px 4px 0 0; cursor:pointer; font-weight:500; }
+.rrh-ig-tab:hover { color:#2271b1; }
+.rrh-ig-tab.active { background:#fff; color:#2271b1; border-color:#c3c4c7; border-bottom-color:#fff; margin-bottom:-2px; }
+
+/* Bulk Product Grid */
+.rrh-ig-product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; max-height:600px; overflow-y:auto; }
+.rrh-ig-product-card { border:2px solid #ddd; border-radius:6px; padding:8px; text-align:center; cursor:pointer; transition:all .2s; }
+.rrh-ig-product-card:hover { border-color:#2271b1; }
+.rrh-ig-product-card.selected { border-color:#2271b1; background:#f0f6fc; }
+.rrh-ig-product-card img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:4px; }
+.rrh-ig-product-card .title { font-size:12px; font-weight:600; margin-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rrh-ig-product-card .price { font-size:11px; color:#666; }
+.rrh-ig-product-card .check { display:none; position:absolute; top:4px; right:4px; background:#2271b1; color:#fff; width:20px; height:20px; border-radius:50%; font-size:12px; line-height:20px; text-align:center; }
+.rrh-ig-product-card.selected .check { display:block; }
+.rrh-ig-product-card { position:relative; }
+
+/* Calendar */
+.rrh-ig-cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.rrh-ig-cal-legend { display:flex; gap:16px; margin-bottom:12px; font-size:13px; color:#666; align-items:center; }
+.rrh-ig-cal-dot { width:12px; height:12px; border-radius:50%; display:inline-block; margin-right:4px; }
+.rrh-ig-cal-dot.published { background:#28a745; }
+.rrh-ig-cal-dot.queued { background:#007bff; }
+.rrh-ig-cal-dot.failed { background:#dc3545; }
+
+.rrh-ig-calendar { display:grid; grid-template-columns:repeat(7, 1fr); gap:2px; }
+.rrh-ig-cal-header { padding:8px; text-align:center; font-weight:600; font-size:12px; color:#666; background:#f5f5f5; }
+.rrh-ig-cal-day { min-height:100px; padding:6px; border:1px solid #eee; background:#fff; font-size:12px; }
+.rrh-ig-cal-day.empty { background:#fafafa; }
+.rrh-ig-cal-day.today { border-color:#2271b1; border-width:2px; }
+.rrh-ig-cal-day .day-num { font-weight:600; margin-bottom:4px; }
+.rrh-ig-cal-post { display:flex; align-items:center; gap:4px; padding:2px 4px; margin:2px 0; border-radius:3px; font-size:11px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rrh-ig-cal-post.published { background:#d4edda; }
+.rrh-ig-cal-post.queued { background:#e8f4fd; }
+.rrh-ig-cal-post.failed { background:#f8d7da; }
+
+/* Responsive */
+@media (max-width:1200px) {
+    .rrh-ig-composer-grid, .rrh-ig-settings-grid, .rrh-ig-bulk-grid, .rrh-ig-insights-grid { grid-template-columns:1fr; }
+    .rrh-ig-stats-grid { grid-template-columns:repeat(2, 1fr); }
+}

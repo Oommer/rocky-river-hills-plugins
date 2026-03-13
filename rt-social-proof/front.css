@@ -1,0 +1,177 @@
+/* RT Social Proof — Frontend Styles */
+
+#rtsp-container {
+    position: fixed;
+    z-index: 999998;
+    pointer-events: none;
+}
+#rtsp-container.bottom-left {
+    bottom: 20px;
+    left: 20px;
+}
+#rtsp-container.bottom-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+.rtsp-toast {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 340px;
+    padding: 14px 18px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+    pointer-events: auto;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .4s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    border: 1px solid rgba(0,0,0,.06);
+    position: relative;
+}
+
+/* Slide animation */
+.rtsp-toast.slide-in.bottom-left {
+    transform: translateX(-120%);
+}
+.rtsp-toast.slide-in.bottom-right {
+    transform: translateX(120%);
+}
+.rtsp-toast.slide-in.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+.rtsp-toast.slide-in.hide.bottom-left {
+    transform: translateX(-120%);
+    opacity: 0;
+}
+.rtsp-toast.slide-in.hide.bottom-right {
+    transform: translateX(120%);
+    opacity: 0;
+}
+
+/* Fade animation */
+.rtsp-toast.fade-in {
+    transform: translateY(10px);
+    opacity: 0;
+}
+.rtsp-toast.fade-in.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+.rtsp-toast.fade-in.hide {
+    transform: translateY(10px);
+    opacity: 0;
+}
+
+/* Image */
+.rtsp-toast-img {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #f5f5f5;
+}
+
+/* Content */
+.rtsp-toast-content {
+    flex: 1;
+    min-width: 0;
+}
+.rtsp-toast-text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #333;
+    margin: 0 0 2px;
+    font-weight: 400;
+}
+.rtsp-toast-product {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rtsp-toast-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #999;
+}
+.rtsp-toast-time {
+    color: #999;
+}
+.rtsp-toast-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #A2755A;
+    font-weight: 600;
+    font-size: 11px;
+}
+.rtsp-toast-verified svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Close button */
+.rtsp-toast-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: #ccc;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all .2s;
+    pointer-events: auto;
+}
+.rtsp-toast-close:hover {
+    background: #f0f0f0;
+    color: #666;
+}
+
+/* Type-specific icon dots */
+.rtsp-toast-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.rtsp-toast-dot.purchase { background: #00a32a; }
+.rtsp-toast-dot.view { background: #2271b1; }
+.rtsp-toast-dot.cart_add { background: #dba617; }
+.rtsp-toast-dot.recent_view { background: #8c8f94; }
+
+/* Hover effect */
+.rtsp-toast:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,.16), 0 4px 12px rgba(0,0,0,.08);
+    transform: translateY(-2px) !important;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    #rtsp-container {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+    }
+    .rtsp-toast {
+        max-width: 100%;
+    }
+}

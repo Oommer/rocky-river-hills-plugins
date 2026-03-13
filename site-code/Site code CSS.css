@@ -1,0 +1,217 @@
+/* Hero Title */
+.elementor-element.hero-title .elementor-widget-container { display: inline-block; }
+
+/* Footer Callout */
+.store-callout .icon-box-icon, .store-callout .icon-box-heading { display: table-cell; vertical-align: middle; }
+.store-callout .icon-box-icon { height: 1em; width: 1em; line-height: 1em; }
+.store-callout .icon-box-icon i { color: #5b4f4f; font-size: 34px; margin-right: 15px; }
+.store-callout .icon-box-heading { font-size: 15px; font-weight: 400; margin: 0; color: #ffffff; letter-spacing: 1px; text-transform: capitalize; }
+
+@media screen and (max-width: 767px) {
+    .store-callout .icon-box-icon { display: none; }
+    .store-callout .icon-box-heading { display: block; text-align: center; }
+}
+
+/* Footer Borders */
+#footer-widgets .contact-info-widget i, #footer-widgets .oceanwp-recent-posts li, #footer-widgets .social-widget li a,
+#footer-widgets .woocommerce ul.product_list_widget li { border-color: rgba(255, 255, 255, 0.2); }
+
+/* Footer Products */
+#footer-widgets .price del, #footer-widgets del .amount { color: #ddd; }
+
+/* Footer Tags */
+#footer-widgets .tagcloud a { background-color: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.1); }
+
+#footer-widgets .tagcloud a:hover { background-color: rgba(255, 255, 255, 0.2); color: #fff; border-color: rgba(255, 255, 255, 0.2); }
+
+/* Tell Darkify to ignore the logo */
+#site-logo img {
+  filter: none !important;
+}
+
+/* Force white logo ONLY in dark mode */
+.darkify_dark_mode_enabled #site-logo img {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Force 3-line hamburger - light mode */
+.hamburger-inner {
+    background-color: #000000 !important;
+}
+
+/* Force 3-line hamburger - dark mode (ALL THREE LINES WHITE) */
+html.darkify_dark_mode_enabled .hamburger-inner,
+html.darkify_dark_mode_enabled .hamburger-inner::before,
+html.darkify_dark_mode_enabled .hamburger-inner::after {
+    background-color: #ffffff !important;
+}
+
+/* Override any Darkify classes on the hamburger */
+html.darkify_dark_mode_enabled .hamburger-inner.darkify_style_all,
+html.darkify_dark_mode_enabled .hamburger-inner[class*="darkify"] {
+    background-color: #ffffff !important;
+}
+
+/* Adjust line spacing */
+.hamburger-inner::before {
+    top: -8px;
+}
+
+.hamburger-inner::after {
+    bottom: -8px;
+}
+
+/* Keep cart and search icons normal */
+html.darkify_dark_mode_enabled .oceanwp-cart-icon,
+html.darkify_dark_mode_enabled .oceanwp-search-icon,
+html.darkify_dark_mode_enabled .cart-icon,
+html.darkify_dark_mode_enabled .search-icon {
+    background-color: transparent !important;
+}
+
+/* Change buttons in ADD ADDRESS section of Addresses under MY Account */
+/* Address headings */
+.woocommerce-Address-title h2 {
+    font-size: 20px !important;
+}
+
+/* Add/Edit buttons */
+.woocommerce-Address-title a.edit {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    border-radius: 50px !important;
+}
+
+/* Account Details Button behavior */
+button.woocommerce-Button, 
+.woocommerce button[type="submit"] {
+    color: white !important;
+}
+
+/* Active/Click state */
+.woocommerce-Button:active,
+.woocommerce button[type="submit"]:active,
+button.button:active {
+    background-color: #835B47 !important;
+    transform: scale(0.98) !important;
+}
+
+/* Add FREE SHIPPING announcement bar above the Top Bar */
+
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+/* Create shipping announcement bar */
+body:before {
+    content: "FREE SHIPPING ON ALL ORDERS OVER $100";
+    display: block;
+    background-color: #A2755A;
+    color: #ffffff;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 9999;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: scroll-alternate 18s ease-in-out infinite;
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+/* Alternating scrolling animation with shorter pause */
+@keyframes scroll-alternate {
+    0% {
+        content: "FREE SHIPPING ON ALL ORDERS OVER $100";
+        text-indent: 100%;
+    }
+    12.5% {
+        content: "FREE SHIPPING ON ALL ORDERS OVER $100";
+        text-indent: 0%;
+    }
+    32.5% {
+        content: "FREE SHIPPING ON ALL ORDERS OVER $100";
+        text-indent: 0%;
+    }
+    49.99% {
+        content: "FREE SHIPPING ON ALL ORDERS OVER $100";
+        text-indent: -150%;
+    }
+    50% {
+        content: "DON'T SEE YOUR TEAM? MESSAGE US. WE CAN MAKE IT!";
+        text-indent: 100%;
+    }
+    62.5% {
+        content: "DON'T SEE YOUR TEAM? MESSAGE US. WE CAN MAKE IT!";
+        text-indent: 0%;
+    }
+    82.5% {
+        content: "DON'T SEE YOUR TEAM? MESSAGE US. WE CAN MAKE IT!";
+        text-indent: 0%;
+    }
+    100% {
+        content: "DON'T SEE YOUR TEAM? MESSAGE US. WE CAN MAKE IT!";
+        text-indent: -150%;
+    }
+}
+
+/* Make it boxed to match header width */
+@media (min-width: 1280px) {
+    body:before {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+}		
+
+/* Darkify dark mode - blog post link colors */
+html.darkify_dark_mode_enabled body.single-post a[class*="darkify"],
+html.darkify_dark_mode_enabled body.single-post a [class*="darkify"],
+html.darkify_dark_mode_enabled body.single-post article a,
+html.darkify_dark_mode_enabled body.single-post article a *,
+html.darkify_dark_mode_enabled body.blog article a,
+html.darkify_dark_mode_enabled body.blog article a * {
+    color: #A2755A !important;
+}
+
+html.darkify_dark_mode_enabled body.single-post article a:hover,
+html.darkify_dark_mode_enabled body.single-post article a:hover *,
+html.darkify_dark_mode_enabled body.blog article a:hover,
+html.darkify_dark_mode_enabled body.blog article a:hover * {
+    color: #835B47 !important;
+}
+/* Reset header and footer links back to default */
+html.darkify_dark_mode_enabled body.single-post #site-header a,
+html.darkify_dark_mode_enabled body.single-post #site-header a *,
+html.darkify_dark_mode_enabled body.single-post #footer a,
+html.darkify_dark_mode_enabled body.single-post #footer a *,
+html.darkify_dark_mode_enabled body.single-post #footer-widgets a,
+html.darkify_dark_mode_enabled body.single-post #footer-widgets a *,
+html.darkify_dark_mode_enabled body.single-post #footerbar a,
+html.darkify_dark_mode_enabled body.single-post #footerbar a *,
+html.darkify_dark_mode_enabled body.blog #site-header a,
+html.darkify_dark_mode_enabled body.blog #site-header a *,
+html.darkify_dark_mode_enabled body.blog #footer a,
+html.darkify_dark_mode_enabled body.blog #footer a *,
+html.darkify_dark_mode_enabled body.blog #footer-widgets a,
+html.darkify_dark_mode_enabled body.blog #footer-widgets a *,
+html.darkify_dark_mode_enabled body.blog #footerbar a,
+html.darkify_dark_mode_enabled body.blog #footerbar a * {
+    color: var(--darkify_dark_mode_text_color) !important;
+}
+/* Dark mode sub-menu styling - brown bg, white text (site-wide) */
+html.darkify_dark_mode_enabled #site-navigation .sub-menu {
+    background-color: #A2755A !important;
+}
+
+html.darkify_dark_mode_enabled #site-navigation .sub-menu a,
+html.darkify_dark_mode_enabled #site-navigation .sub-menu a * {
+    color: #ffffff !important;
+}
+
+html.darkify_dark_mode_enabled #site-navigation .sub-menu a:hover,
+html.darkify_dark_mode_enabled #site-navigation .sub-menu a:hover * {
+    color: #ffffff !important;
+    background-color: #835B47 !important;
+}
