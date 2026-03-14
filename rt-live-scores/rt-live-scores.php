@@ -2,14 +2,14 @@
 /**
  * Plugin Name: RT Live Scores Ticker
  * Description: Live sports scores ticker powered by ESPN data. Matches ESPN.com scoreboard design. Server-side rendered with auto-refresh. Shortcode: [rrh_live_scores]
- * Version: 2.0.0
+ * Version: 2.0.8
  * Author: Rocky River Hills
  * Text Domain: rt-live-scores
  */
 
 if (!defined('ABSPATH')) exit;
 
-define('RTLS_VERSION', '2.0.4');
+define('RTLS_VERSION', '2.0.8');
 define('RTLS_PATH', plugin_dir_path(__FILE__));
 define('RTLS_URL', plugin_dir_url(__FILE__));
 
@@ -39,6 +39,9 @@ class RT_Live_Scores {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend']);
         add_action('admin_menu', [$this, 'admin_menu']);
         add_action('admin_enqueue_scripts', [$this, 'admin_assets']);
+
+        // Inject ticker via OceanWP hook — renders outside Elementor containers
+        add_action('ocean_before_content_wrap', [$this, 'render_via_hook']);
 
         add_action('wp_ajax_rtls_refresh', [$this, 'ajax_refresh']);
         add_action('wp_ajax_nopriv_rtls_refresh', [$this, 'ajax_refresh']);
@@ -323,6 +326,21 @@ class RT_Live_Scores {
         $refresh = intval($settings['refresh_interval'] ?? 60);
 
         return '<div id="rtls-ticker" class="rtls-ticker" data-refresh="' . $refresh . '"><div class="rtls-scroll"><div class="rtls-track" id="rtls-track">' . $inner . '</div><div class="rtls-track rtls-clone" aria-hidden="true">' . $inner . '</div></div></div>';
+    }
+
+    /*--------------------------------------------------------------
+    # Hook Renderer — OceanWP (outside Elementor containers)
+    --------------------------------------------------------------*/
+
+    public function render_via_hook() {
+        $settings = get_option('rtls_settings', []);
+        if (empty($settings['enabled'])) return;
+        if (!empty($settings['hook_disabled'])) return;
+
+        $inner = $this->build_ticker_html();
+        $refresh = intval($settings['refresh_interval'] ?? 60);
+
+        echo '<div id="rtls-ticker" class="rtls-ticker rtls-hooked" data-refresh="' . esc_attr($refresh) . '"><div class="rtls-scroll"><div class="rtls-track" id="rtls-track">' . $inner . '</div><div class="rtls-track rtls-clone" aria-hidden="true">' . $inner . '</div></div></div>';
     }
 
     /*--------------------------------------------------------------
