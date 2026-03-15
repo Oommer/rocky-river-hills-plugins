@@ -55,12 +55,18 @@
                 return;
             }
             $.each(s.recent, function(i, r) {
-                var statusClass = r.status === 'success' ? 'success' : (r.status === 'failed' ? 'failed' : 'pending');
+                var statusClass = r.status === 'success' ? 'success' : (r.status === 'failed' ? 'failed' : (r.status === 'retrying' ? 'retrying' : 'pending'));
+                var statusLabel = r.status;
+                if (r.status === 'retrying' && r.retry_count) {
+                    statusLabel = '↻ retry ' + r.retry_count + '/3';
+                } else if (r.status === 'failed' && r.retry_count > 0) {
+                    statusLabel = 'failed (' + r.retry_count + ' retries)';
+                }
                 var pinLink = r.pin_url ? '<a href="' + r.pin_url + '" target="_blank">View →</a>' : (r.error_message || '—');
                 $tbody.append(
                     '<tr>' +
                     '<td>' + (r.product_name || 'Product #' + r.product_id) + '</td>' +
-                    '<td><span class="rtpp-status-badge ' + statusClass + '">' + r.status + '</span></td>' +
+                    '<td><span class="rtpp-status-badge ' + statusClass + '">' + statusLabel + '</span></td>' +
                     '<td>' + pinLink + '</td>' +
                     '<td>' + (r.created_at || '') + '</td>' +
                     '</tr>'
@@ -207,17 +213,15 @@
 
             var $bl = $('<div class="rtpp-board-list"></div>');
             $.each(res.data, function(i, b) {
+                // Check if this is the default board (stored in settings)
+                var isDefault = false; // Will be compared client-side
                 $bl.append(
-                    '<div class="rtpp-board-item" data-id="' + b.id + '" data-name="' + $('<span>').text(b.name).html() + '" data-desc="' + $('<span>').text(b.description || '').html() + '" data-url="' + (b.url || '') + '">' +
+                    '<div class="rtpp-board-item" data-id="' + b.id + '">' +
                     '<div>' +
                     '<span class="rtpp-board-name">' + $('<span>').text(b.name).html() + '</span>' +
                     '<span class="rtpp-board-count"> · ' + (b.pin_count || 0) + ' pins</span>' +
-                    (b.url ? ' <a href="' + b.url + '" target="_blank" class="rtpp-board-ext-link" title="View on Pinterest">↗</a>' : '') +
                     '</div>' +
-                    '<div style="display:flex;gap:8px;align-items:center;">' +
-                    '<button type="button" class="rtpp-btn small secondary rtpp-edit-board" data-id="' + b.id + '">✏️ Edit</button>' +
-                    '<button type="button" class="rtpp-btn small secondary rtpp-set-default" data-id="' + b.id + '" data-name="' + $('<span>').text(b.name).html() + '" data-url="' + (b.url || '') + '">Set Default</button>' +
-                    '</div>' +
+                    '<button type="button" class="rtpp-btn small secondary rtpp-set-default" data-id="' + b.id + '" data-name="' + $('<span>').text(b.name).html() + '">Set as Default</button>' +
                     '</div>'
                 );
             });
@@ -225,60 +229,14 @@
         });
     }
 
-    $(document).on('click', '#rtpp-refresh-boards', loadBoards);
-
-    // Open edit panel
-    $(document).on('click', '.rtpp-edit-board', function() {
-        var $item = $(this).closest('.rtpp-board-item');
-        var id   = $item.data('id');
-        var name = $item.data('name');
-        var desc = $item.data('desc');
-
-        $('#rtpp-edit-board-id').val(id);
-        $('#rtpp-edit-board-name').val(name);
-        $('#rtpp-edit-board-desc').val(desc);
-        $('#rtpp-edit-board-card').show();
-        $('html, body').animate({ scrollTop: $('#rtpp-edit-board-card').offset().top - 40 }, 300);
-    });
-
-    // Cancel edit
-    $(document).on('click', '#rtpp-cancel-board-edit', function() {
-        $('#rtpp-edit-board-card').hide();
-    });
-
-    // Save board edit
-    $(document).on('click', '#rtpp-save-board-edit', function() {
-        var $btn = $(this);
-        var id   = $('#rtpp-edit-board-id').val();
-        var name = $('#rtpp-edit-board-name').val().trim();
-        var desc = $('#rtpp-edit-board-desc').val().trim();
-
-        if (!name) { toast('Board name is required', true); return; }
-
-        $btn.text('Saving...').prop('disabled', true);
-
-        ajax('rtpp_edit_board', { board_id: id, name: name, description: desc }, function(res) {
-            $btn.text('Save Changes').prop('disabled', false);
-            if (res.success) {
-                toast('Board updated!');
-                $('#rtpp-edit-board-card').hide();
-                loadBoards();
-            } else {
-                toast(res.data || 'Failed to update board', true);
-            }
-        });
-    });
-
     // Set default board
     $(document).on('click', '.rtpp-set-default', function() {
-        var boardId   = $(this).data('id');
+        var boardId = $(this).data('id');
         var boardName = $(this).data('name');
-        var boardUrl  = $(this).data('url') || '';
 
+        // Save via dedicated endpoint
         ajax('rtpp_set_default_board', {
-            board_id:   boardId,
-            board_name: boardName,
-            board_url:  boardUrl,
+            board_id: boardId
         }, function(res) {
             if (res.success) {
                 toast('Default board set to "' + boardName + '"');
@@ -286,13 +244,6 @@
                 $('#step-board').addClass('done');
                 $('.rtpp-board-item').removeClass('selected');
                 $('.rtpp-board-item[data-id="' + boardId + '"]').addClass('selected');
-
-                // Update dashboard board link
-                if (boardUrl) {
-                    $('#stat-board-link').html('<a href="' + boardUrl + '" target="_blank" style="color:var(--rtpp-brand);text-decoration:none;">View on Pinterest →</a>');
-                } else {
-                    $('#stat-board-link').empty();
-                }
             }
         });
     });
@@ -370,8 +321,6 @@
     --------------------------------------------------------------*/
     if (rtpp.connected) {
         loadStats();
-        loadBoards();
-        loadProducts();
         refreshUser();
     }
 
@@ -405,56 +354,6 @@
             $('#rtpp-refresh-user-btn').text('Refresh Account Info').prop('disabled', false);
             toast('Account info refreshed');
         }, 2000);
-    });
-
-    /*--------------------------------------------------------------
-    # Sandbox Toggle
-    --------------------------------------------------------------*/
-    function handleSandboxToggle(sandboxOn, $toggle) {
-        $toggle.prop('disabled', true);
-
-        ajax('rtpp_toggle_sandbox', { sandbox_mode: sandboxOn ? 1 : 0 }, function(res) {
-            $toggle.prop('disabled', false);
-
-            if (!res.success) {
-                toast('Failed to switch mode', true);
-                $toggle.prop('checked', !sandboxOn); // revert
-                return;
-            }
-
-            var onText = '<span style="color:#e67e22;">ON — Pins are sent to the sandbox only. No real pins will be created.</span>';
-            var offText = '<span style="color:#27ae60;">OFF — Pins post live to your real Pinterest boards.</span>';
-
-            $('#sandbox-mode-label').html(sandboxOn ? onText : offText);
-            $('#sandbox-settings-hint').html(sandboxOn ? onText : offText);
-
-            // Sync both toggles
-            $('#rtpp-sandbox-toggle, #rtpp-sandbox-toggle-settings').prop('checked', sandboxOn);
-
-            // Show/hide sandbox header badge
-            if (sandboxOn) {
-                if (!$('.rtpp-sandbox-badge').length) {
-                    $('.rtpp-header > div:last').prepend('<span class="rtpp-sandbox-badge">🧪 SANDBOX MODE</span>');
-                }
-            } else {
-                $('.rtpp-sandbox-badge').remove();
-            }
-
-            toast(res.data.message || 'Mode switched');
-
-            // If it disconnected, reload so connect button appears
-            if (res.data.disconnected) {
-                setTimeout(function() { location.reload(); }, 1500);
-            }
-        });
-    }
-
-    $(document).on('change', '#rtpp-sandbox-toggle', function() {
-        handleSandboxToggle($(this).is(':checked'), $(this));
-    });
-
-    $(document).on('change', '#rtpp-sandbox-toggle-settings', function() {
-        handleSandboxToggle($(this).is(':checked'), $(this));
     });
 
     function updateSteps() {

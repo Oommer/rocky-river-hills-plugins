@@ -1,20 +1,15 @@
-<?php if (!defined('ABSPATH')) exit; $connected = !empty($settings['connected']); $sandbox = !empty($settings['sandbox_mode']); ?>
+<?php if (!defined('ABSPATH')) exit; $connected = !empty($settings['connected']); ?>
 <div class="rtpp-wrap">
     <div class="rtpp-header">
         <div>
             <h1>📌 Pinterest Auto-Poster</h1>
             <p class="rtpp-subtitle">Automatically pin products to Pinterest</p>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-            <?php if ($sandbox): ?>
-                <span class="rtpp-sandbox-badge">🧪 SANDBOX MODE</span>
-            <?php endif; ?>
-            <?php if ($connected): ?>
-                <span class="rtpp-status active">● Connected as @<span id="rtpp-username"><?php echo esc_html($settings['user_name'] ?? ''); ?></span></span>
-            <?php else: ?>
-                <span class="rtpp-status inactive">○ Not Connected</span>
-            <?php endif; ?>
-        </div>
+        <?php if ($connected): ?>
+            <span class="rtpp-status active">● Connected as @<span id="rtpp-username"><?php echo esc_html($settings['user_name'] ?? ''); ?></span></span>
+        <?php else: ?>
+            <span class="rtpp-status inactive">○ Not Connected</span>
+        <?php endif; ?>
     </div>
 
     <?php if (!$connected): ?>
@@ -24,28 +19,7 @@
             <div class="rtpp-connect-icon">📌</div>
             <h2>Connect Your Pinterest Account</h2>
             <p>Link your Pinterest Business account to start auto-pinning your products.</p>
-
-            <!-- Sandbox Toggle -->
-            <div class="rtpp-sandbox-toggle-wrap">
-                <label class="rtpp-sandbox-label">
-                    <div class="rtpp-toggle-switch">
-                        <input type="checkbox" id="rtpp-sandbox-toggle" <?php checked($sandbox); ?>>
-                        <span class="rtpp-toggle-slider"></span>
-                    </div>
-                    <span class="rtpp-sandbox-label-text">
-                        <strong>🧪 Enable Sandbox Mode</strong>
-                        <span id="sandbox-mode-label" style="display:block;font-size:12px;margin-top:2px;">
-                            <?php if ($sandbox): ?>
-                                <span style="color:#e67e22;">ON — Pins won't post publicly. Use this to record your Pinterest demo video.</span>
-                            <?php else: ?>
-                                <span style="color:#27ae60;">OFF — Pins will post live to your real Pinterest account.</span>
-                            <?php endif; ?>
-                        </span>
-                    </span>
-                </label>
-            </div>
-
-            <a href="<?php echo esc_url($this->get_auth_url()); ?>" class="rtpp-btn primary rtpp-btn-lg" id="rtpp-connect-btn">Connect Pinterest Account →</a>
+            <a href="<?php echo esc_url($this->get_auth_url()); ?>" class="rtpp-btn primary rtpp-btn-lg">Connect Pinterest Account →</a>
             <p class="rtpp-hint" style="margin-top:16px;">You'll be redirected to Pinterest to authorize access. We only request permission to manage your pins and boards.</p>
         </div>
     </div>
@@ -83,11 +57,6 @@
                 <div class="rtpp-stat-icon">🏷️</div>
                 <div class="rtpp-stat-num" id="stat-board"><?php echo esc_html($settings['default_board'] ? 'Set' : 'None'); ?></div>
                 <div class="rtpp-stat-label">Default Board</div>
-                <div id="stat-board-link" style="margin-top:6px;font-size:11px;">
-                    <?php if (!empty($settings['default_board_url'])): ?>
-                        <a href="<?php echo esc_url($settings['default_board_url']); ?>" target="_blank" style="color:var(--rtpp-brand);text-decoration:none;">View on Pinterest →</a>
-                    <?php endif; ?>
-                </div>
             </div>
         </div>
 
@@ -155,30 +124,9 @@
     <!-- Boards -->
     <div class="rtpp-panel" id="panel-boards">
         <div class="rtpp-card">
-            <div class="rtpp-card-header">
-                <h3>Your Pinterest Boards</h3>
-                <button type="button" class="rtpp-btn small secondary" id="rtpp-refresh-boards">Refresh</button>
-            </div>
+            <h3>Your Pinterest Boards</h3>
             <div id="rtpp-boards-list">
                 <p class="rtpp-muted">Loading boards...</p>
-            </div>
-        </div>
-
-        <!-- Edit Board (hidden until triggered) -->
-        <div class="rtpp-card" id="rtpp-edit-board-card" style="display:none;border-left:4px solid var(--rtpp-brand);">
-            <h3>✏️ Edit Board</h3>
-            <input type="hidden" id="rtpp-edit-board-id">
-            <div class="rtpp-field">
-                <label>Board Name</label>
-                <input type="text" id="rtpp-edit-board-name" placeholder="Board name">
-            </div>
-            <div class="rtpp-field">
-                <label>Description</label>
-                <textarea id="rtpp-edit-board-desc" rows="3" placeholder="Board description"></textarea>
-            </div>
-            <div style="display:flex;gap:10px;margin-top:4px;">
-                <button type="button" class="rtpp-btn primary" id="rtpp-save-board-edit">Save Changes</button>
-                <button type="button" class="rtpp-btn secondary" id="rtpp-cancel-board-edit">Cancel</button>
             </div>
         </div>
 
@@ -276,30 +224,6 @@
                     <button type="button" class="rtpp-btn secondary small" id="rtpp-refresh-user-btn">Refresh Account Info</button>
                     <button type="button" class="rtpp-btn danger" id="rtpp-disconnect" style="margin-left:8px;">Disconnect Pinterest</button>
                 </div>
-            </div>
-
-            <div class="rtpp-card rtpp-sandbox-card">
-                <h3>🧪 API Mode</h3>
-                <p class="rtpp-hint" style="margin-bottom:14px;">Use <strong>Sandbox mode</strong> to test pin creation without posting publicly — useful for recording your Pinterest API demo video. Switching modes will disconnect your account so you can re-authorize against the correct environment.</p>
-                <label class="rtpp-sandbox-label" style="justify-content:flex-start;gap:16px;">
-                    <div class="rtpp-toggle-switch">
-                        <input type="checkbox" id="rtpp-sandbox-toggle-settings" <?php checked($sandbox); ?>>
-                        <span class="rtpp-toggle-slider"></span>
-                    </div>
-                    <span>
-                        <strong>🧪 Enable Sandbox Mode</strong><br>
-                        <span class="rtpp-hint" id="sandbox-settings-hint">
-                            <?php if ($sandbox): ?>
-                                <span style="color:#e67e22;">ON — Pins are sent to the sandbox only. No real pins will be created.</span>
-                            <?php else: ?>
-                                <span style="color:#27ae60;">OFF — Pins post live to your real Pinterest boards.</span>
-                            <?php endif; ?>
-                        </span>
-                    </span>
-                </label>
-                <?php if ($sandbox): ?>
-                <div class="rtpp-notice warning" style="margin-top:14px;">⚠️ You are in Sandbox mode. No real pins will be created until you switch to Production and reconnect.</div>
-                <?php endif; ?>
             </div>
 
             <div class="rtpp-card">

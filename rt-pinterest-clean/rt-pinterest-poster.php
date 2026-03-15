@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RT Pinterest Auto-Poster
  * Description: Automatically pin your WooCommerce products to Pinterest with smart descriptions, hashtags, and scheduling.
- * Version: 1.4.5
+ * Version: 1.5.0
  * Author: Rocky River Hills
  * Requires Plugins: woocommerce
  * Text Domain: rt-pinterest-poster
@@ -10,15 +10,12 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('RTPP_VERSION', '1.4.6');
+define('RTPP_VERSION', '1.5.0');
 define('RTPP_PATH', plugin_dir_path(__FILE__));
 define('RTPP_URL', plugin_dir_url(__FILE__));
-define('RTPP_APP_ID', defined('RRH_PINTEREST_APP_ID') ? RRH_PINTEREST_APP_ID : '');
-define('RTPP_APP_SECRET', defined('RRH_PINTEREST_APP_SECRET') ? RRH_PINTEREST_APP_SECRET : '');
-define('RTPP_API_PRODUCTION', 'https://api.pinterest.com/v5');
-define('RTPP_API_SANDBOX', 'https://api-sandbox.pinterest.com/v5');
-define('RTPP_OAUTH_PRODUCTION', 'https://www.pinterest.com/oauth/');
-define('RTPP_OAUTH_SANDBOX', 'https://www.pinterest.com/oauth/');
+define('RTPP_APP_ID', '1547820');
+define('RTPP_APP_SECRET', 'eb20b523c51c2623099a830c9c5f5eb850e7db3b');
+define('RTPP_API_BASE', 'https://api.pinterest.com/v5');
 
 class RT_Pinterest_Poster {
 
@@ -31,7 +28,6 @@ class RT_Pinterest_Poster {
         'connected' => 0,
         'user_name' => '',
         'default_board' => '',
-        'sandbox_mode' => 0,
         'auto_pin_new' => 1,
         'pin_description_template' => "{product_name} — {short_description}\n\nShop now at {product_url}\n\n{hashtags}",
         'default_hashtags' => '#stadiumcoasters #sportsart #wallart #mancave #sportsroom #handmade #homedecor #sportsfan #giftideas #collegefootball',
@@ -54,16 +50,6 @@ class RT_Pinterest_Poster {
         return self::$instance;
     }
 
-    private function api_base() {
-        $settings = get_option('rtpp_settings', []);
-        return !empty($settings['sandbox_mode']) ? RTPP_API_SANDBOX : RTPP_API_PRODUCTION;
-    }
-
-    private function is_sandbox() {
-        $settings = get_option('rtpp_settings', []);
-        return !empty($settings['sandbox_mode']);
-    }
-
     private function __construct() {
         register_activation_hook(__FILE__, [$this, 'activate']);
         register_deactivation_hook(__FILE__, [$this, 'deactivate']);
@@ -81,7 +67,6 @@ class RT_Pinterest_Poster {
         add_action('wp_ajax_rtpp_create_board', [$this, 'ajax_create_board']);
         add_action('wp_ajax_rtpp_set_default_board', [$this, 'ajax_set_default_board']);
         add_action('wp_ajax_rtpp_pin_now', [$this, 'ajax_pin_now']);
-        add_action('wp_ajax_rtpp_edit_board', [$this, 'ajax_edit_board']);
         add_action('wp_ajax_rtpp_pin_all', [$this, 'ajax_pin_all']);
         add_action('wp_ajax_rtpp_get_stats', [$this, 'ajax_get_stats']);
         add_action('wp_ajax_rtpp_get_products', [$this, 'ajax_get_products']);
@@ -89,7 +74,6 @@ class RT_Pinterest_Poster {
         add_action('wp_ajax_rtpp_clear_schedule', [$this, 'ajax_clear_schedule']);
         add_action('wp_ajax_rtpp_reset_pinned', [$this, 'ajax_reset_pinned']);
         add_action('wp_ajax_rtpp_refresh_user', [$this, 'ajax_refresh_user']);
-        add_action('wp_ajax_rtpp_toggle_sandbox', [$this, 'ajax_toggle_sandbox']);
 
         // Cron
         add_action('rtpp_process_scheduled_pins', [$this, 'process_scheduled_pins']);
@@ -134,16 +118,20 @@ class RT_Pinterest_Poster {
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             product_id BIGINT UNSIGNED NOT NULL,
             board_id VARCHAR(100) NOT NULL,
-            pin_id VARCHAR(100) DEFAULT '',
-            pin_url VARCHAR(500) DEFAULT '',
-            status VARCHAR(20) DEFAULT 'pending',
-            error_message TEXT DEFAULT '',
+            pin_id VARCHAR(100) DEFAULT \'\',
+            pin_url VARCHAR(500) DEFAULT \'\',
+            status VARCHAR(20) DEFAULT \'pending\',
+            error_message TEXT DEFAULT \'\',
+            retry_count TINYINT UNSIGNED DEFAULT 0,
             created_at DATETIME NOT NULL,
             pinned_at DATETIME DEFAULT NULL,
             INDEX idx_product (product_id),
             INDEX idx_status (status),
             INDEX idx_created (created_at)
         ) $charset");
+
+        // Add retry_count to existing installs
+        $wpdb->query("ALTER TABLE {$wpdb->prefix}rtpp_pin_log ADD COLUMN IF NOT EXISTS retry_count TINYINT UNSIGNED DEFAULT 0");
 
         // Scheduled pins table
         $wpdb->query("CREATE TABLE IF NOT EXISTS {$wpdb->prefix}rtpp_scheduled_pins (
@@ -152,8 +140,12 @@ class RT_Pinterest_Poster {
             board_id VARCHAR(100) NOT NULL,
             scheduled_at DATETIME NOT NULL,
             processed TINYINT(1) DEFAULT 0,
+            retry_count TINYINT UNSIGNED DEFAULT 0,
             INDEX idx_scheduled (scheduled_at, processed)
         ) $charset");
+
+        // Add retry_count to existing installs
+        $wpdb->query("ALTER TABLE {$wpdb->prefix}rtpp_scheduled_pins ADD COLUMN IF NOT EXISTS retry_count TINYINT UNSIGNED DEFAULT 0");
 
         $defaults = $this->defaults;
 
@@ -261,7 +253,7 @@ class RT_Pinterest_Poster {
     }
 
     private function exchange_code_for_token($code) {
-        $response = wp_remote_post($this->api_base() . '/oauth/token', [
+        $response = wp_remote_post(RTPP_API_BASE . '/oauth/token', [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode(RTPP_APP_ID . ':' . RTPP_APP_SECRET),
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -286,7 +278,7 @@ class RT_Pinterest_Poster {
         $settings = get_option('rtpp_settings', []);
         if (empty($settings['refresh_token'])) return false;
 
-        $response = wp_remote_post($this->api_base() . '/oauth/token', [
+        $response = wp_remote_post(RTPP_API_BASE . '/oauth/token', [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode(RTPP_APP_ID . ':' . RTPP_APP_SECRET),
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -333,7 +325,7 @@ class RT_Pinterest_Poster {
         $token = $this->get_access_token();
         if (!$token) return false;
 
-        $url = $this->api_base() . $endpoint;
+        $url = RTPP_API_BASE . $endpoint;
         if ($params) $url .= '?' . http_build_query($params);
 
         $response = wp_remote_get($url, [
@@ -361,7 +353,7 @@ class RT_Pinterest_Poster {
         $token = $this->get_access_token();
         if (!$token) return false;
 
-        $response = wp_remote_post($this->api_base() . $endpoint, [
+        $response = wp_remote_post(RTPP_API_BASE . $endpoint, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
@@ -397,60 +389,15 @@ class RT_Pinterest_Poster {
         $result = [];
         foreach ($boards['items'] as $board) {
             $result[] = [
-                'id'          => $board['id'],
-                'name'        => $board['name'],
+                'id' => $board['id'],
+                'name' => $board['name'],
                 'description' => $board['description'] ?? '',
-                'pin_count'   => $board['pin_count'] ?? 0,
-                'url'         => $board['url'] ?? ('https://www.pinterest.com/' . ($board['owner']['username'] ?? '') . '/' . ($board['name'] ? sanitize_title($board['name']) : $board['id']) . '/'),
+                'pin_count' => $board['pin_count'] ?? 0,
+                'url' => 'https://pinterest.com/pin/' . $board['id'],
             ];
         }
 
         return $result;
-    }
-
-    public function ajax_edit_board() {
-        check_ajax_referer('rtpp_nonce', 'nonce');
-        if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized');
-
-        $board_id = sanitize_text_field($_POST['board_id']          ?? '');
-        $name     = sanitize_text_field($_POST['name']               ?? '');
-        $desc     = sanitize_textarea_field($_POST['description']    ?? '');
-
-        if (empty($board_id)) wp_send_json_error('No board ID');
-        if (empty($name))     wp_send_json_error('Board name required');
-
-        $token = $this->get_access_token();
-        if (!$token) wp_send_json_error('Not connected');
-
-        $response = wp_remote_request($this->api_base() . '/boards/' . $board_id, [
-            'method'  => 'PATCH',
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type'  => 'application/json',
-            ],
-            'body'    => wp_json_encode(['name' => $name, 'description' => $desc]),
-            'timeout' => 30,
-        ]);
-
-        if (is_wp_error($response)) {
-            wp_send_json_error($response->get_error_message());
-        }
-
-        $code = wp_remote_retrieve_response_code($response);
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-
-        if ($code >= 400) {
-            wp_send_json_error($body['message'] ?? 'API error ' . $code);
-        }
-
-        // If this was the default board, update stored name
-        $settings = get_option('rtpp_settings', []);
-        if (($settings['default_board'] ?? '') === $board_id) {
-            $settings['default_board_name'] = $name;
-            update_option('rtpp_settings', $settings);
-        }
-
-        wp_send_json_success(['board' => $body, 'message' => 'Board updated successfully']);
     }
 
     public function create_board($name, $description = '') {
@@ -465,7 +412,7 @@ class RT_Pinterest_Poster {
     # Pin Creation
     --------------------------------------------------------------*/
 
-    public function create_pin($product_id, $board_id) {
+    public function create_pin($product_id, $board_id, $retry_count = 0) {
         $product = wc_get_product($product_id);
         if (!$product) return ['error' => 'Product not found'];
 
@@ -508,7 +455,7 @@ class RT_Pinterest_Poster {
         $result = $this->api_post('/pins', $pin_data);
 
         // Log the result
-        $this->log_pin($product_id, $board_id, $result);
+        $this->log_pin($product_id, $board_id, $result, $retry_count);
 
         return $result;
     }
@@ -533,13 +480,7 @@ class RT_Pinterest_Poster {
 
         // Short description
         $short_desc = wp_strip_all_tags($product->get_short_description());
-
-        // Remove standalone heading lines that end with a colon (e.g. "Specifications:", "Product Features:")
-        // Match any line that contains only text + colon, no matter the length
-        $short_desc = preg_replace('/^[^\n]+:\s*$/m', '', $short_desc);
-        $short_desc = trim(preg_replace('/\n{3,}/', "\n\n", $short_desc));
-
-        $short_desc = $this->smart_truncate($short_desc, 200);
+        $short_desc = mb_substr($short_desc, 0, 200);
 
         // Replacements
         $replacements = [
@@ -557,45 +498,6 @@ class RT_Pinterest_Poster {
         $description = preg_replace("/\n{3,}/", "\n\n", $description);
 
         return trim($description);
-    }
-
-    /**
-     * Truncate a short description cleanly by line.
-     * - Splits on newlines, keeps only complete lines that fit within $limit
-     * - A "complete" line is one that doesn't trail off mid-sentence
-     *   (i.e. it either ends with punctuation OR is a short bullet-style phrase)
-     * - Never returns a dangling partial line like "Metal holder for storage or"
-     */
-    private function smart_truncate($text, $limit = 200) {
-        $text = trim($text);
-
-        // Already within limit — nothing to do
-        if (mb_strlen($text) <= $limit) return $text;
-
-        // Split into lines and filter blanks
-        $lines = array_filter(
-            preg_split('/\r\n|\r|\n/', $text),
-            fn($l) => trim($l) !== ''
-        );
-
-        $kept   = [];
-        $length = 0;
-
-        foreach ($lines as $line) {
-            $line       = trim($line);
-            $line_len   = mb_strlen($line);
-            $new_length = $length + ($length > 0 ? 1 : 0) + $line_len;
-
-            // If adding this line would exceed the limit, stop here
-            if ($new_length > $limit) {
-                break;
-            }
-
-            $kept[]  = $line;
-            $length  = $new_length;
-        }
-
-        return implode("\n", $kept);
     }
 
     private function build_hashtags($product, $settings) {
@@ -734,7 +636,8 @@ class RT_Pinterest_Poster {
         ));
 
         foreach ($pins as $pin) {
-            $result = $this->create_pin($pin->product_id, $pin->board_id);
+            $retry_count = isset($pin->retry_count) ? (int) $pin->retry_count : 0;
+            $result = $this->create_pin($pin->product_id, $pin->board_id, $retry_count);
             $wpdb->update($table, ['processed' => 1], ['id' => $pin->id]);
 
             // Small delay between pins to be respectful to API
@@ -769,25 +672,72 @@ class RT_Pinterest_Poster {
         ));
     }
 
-    private function log_pin($product_id, $board_id, $result) {
+    /**
+     * Errors that are transient (Pinterest-side timeouts, crawl failures).
+     * These are worth retrying automatically.
+     */
+    private function is_retryable_error($error_message) {
+        $retryable = [
+            'Unable to reach the URL',
+            'timeout',
+            'timed out',
+            'temporarily unavailable',
+            'rate limit',
+            'server error',
+            '500',
+            '503',
+            '429',
+        ];
+        foreach ($retryable as $phrase) {
+            if (stripos($error_message, $phrase) !== false) return true;
+        }
+        return false;
+    }
+
+    private function log_pin($product_id, $board_id, $result, $retry_count = 0) {
         global $wpdb;
 
         $data = [
-            'product_id' => $product_id,
-            'board_id' => $board_id,
-            'created_at' => current_time('mysql'),
+            'product_id'  => $product_id,
+            'board_id'    => $board_id,
+            'retry_count' => $retry_count,
+            'created_at'  => current_time('mysql'),
         ];
 
         if (!empty($result['error'])) {
-            $data['status'] = 'failed';
-            $data['error_message'] = $result['error'];
+            $error_msg = $result['error'];
+
+            // If retryable and under the limit, re-schedule instead of failing
+            if ($this->is_retryable_error($error_msg) && $retry_count < 3) {
+                $data['status']        = 'retrying';
+                $data['error_message'] = $error_msg;
+                $wpdb->insert($wpdb->prefix . 'rtpp_pin_log', $data);
+
+                // Re-queue with a 30-minute delay per attempt
+                $retry_at = date('Y-m-d H:i:s', time() + (1800 * ($retry_count + 1)));
+                $wpdb->insert($wpdb->prefix . 'rtpp_scheduled_pins', [
+                    'product_id'   => $product_id,
+                    'board_id'     => $board_id,
+                    'scheduled_at' => $retry_at,
+                    'processed'    => 0,
+                    'retry_count'  => $retry_count + 1,
+                ]);
+                return;
+            }
+
+            // Non-retryable or exhausted retries — mark permanently failed
+            $data['status']        = 'failed';
+            $data['error_message'] = $retry_count >= 3
+                ? $error_msg . ' (failed after ' . $retry_count . ' retries)'
+                : $error_msg;
+
         } elseif (!empty($result['id'])) {
-            $data['status'] = 'success';
-            $data['pin_id'] = $result['id'];
-            $data['pin_url'] = 'https://pinterest.com/pin/' . $result['id'];
+            $data['status']    = 'success';
+            $data['pin_id']    = $result['id'];
+            $data['pin_url']   = 'https://pinterest.com/pin/' . $result['id'];
             $data['pinned_at'] = current_time('mysql');
         } else {
-            $data['status'] = 'unknown';
+            $data['status']        = 'unknown';
             $data['error_message'] = wp_json_encode($result);
         }
 
@@ -820,7 +770,6 @@ class RT_Pinterest_Poster {
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('rtpp_nonce'),
             'connected' => !empty($settings['connected']),
-            'sandbox_mode' => !empty($settings['sandbox_mode']),
             'auth_url' => $this->get_auth_url(),
         ]);
     }
@@ -861,11 +810,6 @@ class RT_Pinterest_Poster {
             foreach ($settings_toggles as $key) {
                 $merged[$key] = isset($data[$key]) ? 1 : 0;
             }
-        }
-
-        // Sandbox toggle — always handled if present in POST
-        if (array_key_exists('sandbox_mode', $data)) {
-            $merged['sandbox_mode'] = isset($data['sandbox_mode']) ? 1 : 0;
         }
 
         // Sanitize non-sensitive string fields
@@ -928,22 +872,14 @@ class RT_Pinterest_Poster {
         check_ajax_referer('rtpp_nonce', 'nonce');
         if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized');
 
-        $board_id   = sanitize_text_field($_POST['board_id']   ?? '');
-        $board_name = sanitize_text_field($_POST['board_name'] ?? '');
-        $board_url  = esc_url_raw($_POST['board_url']          ?? '');
+        $board_id = sanitize_text_field($_POST['board_id'] ?? '');
         if (empty($board_id)) wp_send_json_error('No board ID');
 
         $settings = get_option('rtpp_settings', []);
-        $settings['default_board']      = $board_id;
-        $settings['default_board_name'] = $board_name;
-        $settings['default_board_url']  = $board_url;
+        $settings['default_board'] = $board_id;
         update_option('rtpp_settings', $settings);
 
-        wp_send_json_success([
-            'message'    => 'Default board updated',
-            'board_url'  => $board_url,
-            'board_name' => $board_name,
-        ]);
+        wp_send_json_success('Default board updated');
     }
 
     public function ajax_pin_now() {
@@ -979,84 +915,29 @@ class RT_Pinterest_Poster {
         if (empty($board_id)) wp_send_json_error('No board selected');
 
         // Get all published products
-        $all_ids = get_posts([
-            'post_type'      => 'product',
-            'post_status'    => 'publish',
+        $products = get_posts([
+            'post_type' => 'product',
+            'post_status' => 'publish',
             'posts_per_page' => -1,
-            'fields'         => 'ids',
+            'fields' => 'ids',
         ]);
 
-        // Filter out already pinned or scheduled
-        $eligible = [];
-        foreach ($all_ids as $id) {
-            if (!$this->is_product_pinned($id, $board_id) && !$this->is_product_scheduled($id, $board_id)) {
-                $eligible[] = $id;
-            }
-        }
-
-        if (empty($eligible)) {
-            wp_send_json_success([
-                'scheduled' => 0,
-                'skipped'   => count($all_ids),
-                'message'   => 'All products are already pinned or scheduled.',
-            ]);
-        }
-
-        // Group products by their primary category
-        $by_category = [];
-        $no_category = [];
-
-        foreach ($eligible as $id) {
-            $cats = get_the_terms($id, 'product_cat');
-            if ($cats && !is_wp_error($cats)) {
-                $key = $cats[0]->slug;
-                $by_category[$key][] = $id;
-            } else {
-                $no_category[] = $id;
-            }
-        }
-
-        // Shuffle within each category so same-category pins aren't alphabetical
-        foreach ($by_category as &$cat_ids) {
-            shuffle($cat_ids);
-        }
-        unset($cat_ids);
-        shuffle($no_category);
-
-        // Interleave: round-robin across categories
-        // Result: Alabama, West Virginia, Ohio State, Alabama, West Virginia...
-        $category_keys = array_keys($by_category);
-        shuffle($category_keys);
-        $interleaved = [];
-
-        $max_rounds = !empty($by_category) ? max(array_map('count', $by_category)) : 0;
-        for ($round = 0; $round < $max_rounds; $round++) {
-            foreach ($category_keys as $key) {
-                if (isset($by_category[$key][$round])) {
-                    $interleaved[] = $by_category[$key][$round];
-                }
-            }
-        }
-
-        // Sprinkle uncategorized products randomly into the interleaved list
-        foreach ($no_category as $id) {
-            $pos = rand(0, count($interleaved));
-            array_splice($interleaved, $pos, 0, [$id]);
-        }
-
-        // Schedule in interleaved order
         $scheduled = 0;
-        foreach ($interleaved as $product_id) {
-            $result = $this->schedule_product_pin($product_id, $board_id);
-            if ($result) $scheduled++;
-        }
+        $skipped = 0;
 
-        $skipped = count($all_ids) - count($eligible);
+        foreach ($products as $product_id) {
+            $result = $this->schedule_product_pin($product_id, $board_id);
+            if ($result) {
+                $scheduled++;
+            } else {
+                $skipped++;
+            }
+        }
 
         wp_send_json_success([
             'scheduled' => $scheduled,
-            'skipped'   => $skipped,
-            'message'   => "{$scheduled} products scheduled with category interleaving. {$skipped} skipped (already pinned or scheduled).",
+            'skipped' => $skipped,
+            'message' => "{$scheduled} products scheduled for pinning. {$skipped} skipped (already pinned or scheduled).",
         ]);
     }
 
@@ -1166,35 +1047,6 @@ class RT_Pinterest_Poster {
         } else {
             wp_send_json_error('Could not fetch user info');
         }
-    }
-
-    public function ajax_toggle_sandbox() {
-        check_ajax_referer('rtpp_nonce', 'nonce');
-        if (!current_user_can('manage_options')) wp_send_json_error('Unauthorized');
-
-        $settings = get_option('rtpp_settings', []);
-        $new_state = !empty($_POST['sandbox_mode']) ? 1 : 0;
-        $settings['sandbox_mode'] = $new_state;
-
-        // When switching modes, disconnect so user re-auths against correct environment
-        if ($settings['connected']) {
-            $settings['access_token'] = '';
-            $settings['refresh_token'] = '';
-            $settings['token_expires'] = 0;
-            $settings['connected'] = 0;
-            $settings['user_name'] = '';
-            $disconnected = true;
-        }
-
-        update_option('rtpp_settings', $settings);
-
-        wp_send_json_success([
-            'sandbox_mode' => $new_state,
-            'disconnected' => $disconnected ?? false,
-            'message' => $new_state
-                ? 'Sandbox mode enabled. Please reconnect to Pinterest.'
-                : 'Production mode enabled. Please reconnect to Pinterest.',
-        ]);
     }
 }
 
